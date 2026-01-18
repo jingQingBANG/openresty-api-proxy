@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  openresty-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: openresty-api-proxy
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+      - "8082:8082"
+    volumes:
+      # 挂载配置文件以便热更新（可选）
+      - ./conf/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro
+      - ./lua:/usr/local/openresty/nginx/lua:ro
+      # 挂载日志目录
+      - ./logs:/usr/local/openresty/nginx/logs
+    environment:
+      - ZERION_API_KEY=zerio
+      - ALCHEMY_API_KEY=alchemy
+      - COINGECKO_API_KEY=coingecko
+    restart: unless-stopped
+    networks:
+      - proxy-network
+
+networks:
+  proxy-network:
+    driver: bridge
